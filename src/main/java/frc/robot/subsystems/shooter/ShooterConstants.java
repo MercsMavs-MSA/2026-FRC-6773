@@ -10,9 +10,10 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.Constants;
 
-public class ShooterConstants { // TODO: CLEANUP
-  public static final Rotation2d turretMaxLimit = Rotation2d.fromRotations(0.27);
-  public static final Rotation2d turretMinLimit = Rotation2d.fromRotations(-0.504);
+public class ShooterConstants {
+  // TODO:
+  public static final Rotation2d turretMaxLimit = Rotation2d.fromRotations(0.653);
+  public static final Rotation2d turretMinLimit = Rotation2d.fromRotations(-0.343);
 
   public static final Rotation2d turretPositionTolerance = new Rotation2d(Math.toRadians(0.5));
 

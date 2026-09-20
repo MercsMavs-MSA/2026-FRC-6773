@@ -142,7 +142,7 @@
 //         break;
 //     }
 
-//     // MARK: - CLIMB(TODO)
+//     // MARK: - CLIMB()
 //     // ADD CLIMBER HERE WHEN DONE
 //   }
 

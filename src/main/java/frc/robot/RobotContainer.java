@@ -116,7 +116,7 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
   private Field2d field = new Field2d();
-  private Field2d trajField = new Field2d();
+  // private Field2d trajField = new Field2d();
 
   private Trigger rumbleTrigger;
 
