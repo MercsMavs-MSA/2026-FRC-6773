@@ -11,8 +11,8 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.constants.Constants;
 
 public class ShooterConstants { // TODO: CLEANUP
-  public static final Rotation2d turretMaxLimit = Rotation2d.fromDegrees(183.5);
-  public static final Rotation2d turretMinLimit = Rotation2d.fromDegrees(-181.5);
+  public static final Rotation2d turretMaxLimit = Rotation2d.fromRotations(0.27);
+  public static final Rotation2d turretMinLimit = Rotation2d.fromRotations(-0.504);
 
   public static final Rotation2d turretPositionTolerance = new Rotation2d(Math.toRadians(0.5));
 
@@ -73,7 +73,7 @@ public class ShooterConstants { // TODO: CLEANUP
   public static final ShooterTurretHardware turretHardware = new ShooterTurretHardware(53, 54, 10d);
 
   public static final TurretMotorConfiguration turretConfigs =
-      new TurretMotorConfiguration(false, true, true, 60, 50, 12, -12, NeutralModeValue.Brake);
+      new TurretMotorConfiguration(false, true, true, 60, 50, 6, -6, NeutralModeValue.Brake);
   public static final FlywheelMotorConfiguration flywheelConfigs =
       new FlywheelMotorConfiguration(true, true, true, 80, 60, 12, -12, NeutralModeValue.Coast);
   public static final HoodMotorConfiguration hoodConfigs =

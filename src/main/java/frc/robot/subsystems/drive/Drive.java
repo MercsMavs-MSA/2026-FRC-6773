@@ -32,6 +32,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.networktables.BooleanEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Alert;
@@ -53,6 +55,7 @@ import frc.robot.util.ZoneUtil;
 import frc.robot.util.geometry.AllianceFlipUtil;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -88,6 +91,12 @@ public class Drive extends SubsystemBase {
   private static final double kAccelFilterAlpha = 0.15;
 
   private Trigger bumpTrigger;
+  private BooleanSupplier isShootingActive = () -> false;
+  private final BooleanEntry shootingSlowdownEnabled =
+      NetworkTableInstance.getDefault()
+          .getTable("Drive")
+          .getBooleanTopic("ShootingSlowdownEnabled")
+          .getEntry(true);
 
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY = DriveConstants.kCANBus.isNetworkFD() ? 250.0 : 100.0;
@@ -189,10 +198,16 @@ public class Drive extends SubsystemBase {
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
 
+    shootingSlowdownEnabled.set(true);
+
     bumpTrigger =
         ZoneUtil.BUMP_ZONES.willContain(this::getPose, this::getFieldVelocity, Seconds.of(0.3));
     bumpTrigger.onTrue(Commands.runOnce(() -> setDriveState(DriveState.BUMP)));
-    bumpTrigger.onFalse(Commands.runOnce(() -> setDriveState(DriveState.DRIVING)));
+    bumpTrigger.onFalse(
+        Commands.runOnce(
+            () ->
+                setDriveState(
+                    isShootingActive.getAsBoolean() ? DriveState.SHOOTING : DriveState.DRIVING)));
     bumpTrigger.debounce(0.5);
     timer = new Timer();
     timer.start();
@@ -266,7 +281,7 @@ public class Drive extends SubsystemBase {
           speedCap = Double.MAX_VALUE;
           break;
         case SHOOTING:
-          speedCap = 3.0; // m / s
+          speedCap = shootingSlowdownEnabled.get() ? 2.0 : Double.MAX_VALUE;
           break;
         case BUMP:
           speedCap = 2.5; // m / s
@@ -334,6 +349,10 @@ public class Drive extends SubsystemBase {
 
   public DriveState getDriveState() {
     return driveState;
+  }
+
+  public void setShootingActiveSupplier(BooleanSupplier supplier) {
+    this.isShootingActive = supplier;
   }
 
   /**
@@ -445,7 +464,7 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns the current odometry pose. */
-  @AutoLogOutput(key = "Odometry/Robot")
+  @AutoLogMavs(key = "Odometry/Robot")
   public Pose2d getPose() {
     return poseEstimator.getEstimatedPosition();
   }

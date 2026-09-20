@@ -488,6 +488,23 @@ public class RobotContainer {
 
     // DriveCommands.setDriveState(drive, DriveState.DRIVING);
     drive.setDriveState(DriveState.DRIVING);
+
+    Trigger shootTrigger = controller.rightTrigger().or(opController.rightBumper());
+    drive.setShootingActiveSupplier(shootTrigger);
+    shootTrigger
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  if (drive.getDriveState() != DriveState.BUMP)
+                    drive.setDriveState(DriveState.SHOOTING);
+                }))
+        .onFalse(
+            Commands.runOnce(
+                () -> {
+                  if (drive.getDriveState() != DriveState.BUMP)
+                    drive.setDriveState(DriveState.DRIVING);
+                }));
+
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDriveXLock(
