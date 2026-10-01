@@ -90,6 +90,8 @@ public class Drive extends SubsystemBase {
 
   private static final double kAccelFilterAlpha = 0.15;
 
+  private static final double rookieSpeedCap = 3.0; // m/s
+
   private Trigger bumpTrigger;
   private BooleanSupplier isShootingActive = () -> false;
   private final BooleanEntry shootingSlowdownEnabled =
@@ -97,6 +99,11 @@ public class Drive extends SubsystemBase {
           .getTable("Drive")
           .getBooleanTopic("ShootingSlowdownEnabled")
           .getEntry(true);
+  private final BooleanEntry rookieModeEnabled =
+      NetworkTableInstance.getDefault()
+          .getTable("Drive")
+          .getBooleanTopic("RookieModeEnabled")
+          .getEntry(false);
 
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY = DriveConstants.kCANBus.isNetworkFD() ? 250.0 : 100.0;
@@ -199,6 +206,7 @@ public class Drive extends SubsystemBase {
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
 
     shootingSlowdownEnabled.set(true);
+    rookieModeEnabled.set(false);
 
     bumpTrigger =
         ZoneUtil.BUMP_ZONES.willContain(this::getPose, this::getFieldVelocity, Seconds.of(0.3));
@@ -363,8 +371,10 @@ public class Drive extends SubsystemBase {
   public void runVelocity(ChassisSpeeds speeds) {
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
+    double effectiveCap =
+        Math.min(speedCap, rookieModeEnabled.get() ? rookieSpeedCap : Double.MAX_VALUE);
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        setpointStates, Math.min(speedCap, DriveConstants.kSpeedAt12Volts.in(MetersPerSecond)));
+        setpointStates, Math.min(effectiveCap, DriveConstants.kSpeedAt12Volts.in(MetersPerSecond)));
 
     // Log unoptimized setpoints and setpoint speeds
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
