@@ -289,7 +289,7 @@ public class Drive extends SubsystemBase {
           speedCap = Double.MAX_VALUE;
           break;
         case SHOOTING:
-          speedCap = shootingSlowdownEnabled.get() ? 2.0 : Double.MAX_VALUE;
+          speedCap = Double.MAX_VALUE;
           break;
         case BUMP:
           speedCap = 2.5; // m / s
@@ -371,10 +371,10 @@ public class Drive extends SubsystemBase {
   public void runVelocity(ChassisSpeeds speeds) {
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
-    double effectiveCap =
-        Math.min(speedCap, rookieModeEnabled.get() ? rookieSpeedCap : Double.MAX_VALUE);
+    // double effectiveCap =
+    //     Math.min(speedCap, rookieModeEnabled.get() ? rookieSpeedCap : Double.MAX_VALUE);
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        setpointStates, Math.min(effectiveCap, DriveConstants.kSpeedAt12Volts.in(MetersPerSecond)));
+        setpointStates, Math.min(speedCap, DriveConstants.kSpeedAt12Volts.in(MetersPerSecond)));
 
     // Log unoptimized setpoints and setpoint speeds
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
