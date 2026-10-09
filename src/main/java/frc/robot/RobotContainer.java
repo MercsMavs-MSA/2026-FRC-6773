@@ -431,7 +431,11 @@ public class RobotContainer {
     // autonCommands.getAutonomousSequence("SHUNT_LEFT"));
 
     autoChooser.addOption("Right Normal", autonCommands.getAutonomousSequence("RIGHT_NO_OUTPOST"));
-    autoChooser.addDefaultOption("Right Normal", autonCommands.getAutonomousSequence("RIGHT_CUT"));
+    // RIGHT_NO_OUTPOST_FLIPPED
+    autoChooser.addOption(
+        "Right Flipped", autonCommands.getAutonomousSequence("RIGHT_NO_OUTPOST_FLIPPED"));
+
+    autoChooser.addDefaultOption("Right Cut", autonCommands.getAutonomousSequence("RIGHT_CUT"));
     autoChooser.addOption(
         "Right Normal - AMA", autonCommands.getAutonomousSequence("RIGHT_NO_OUTPOST_AMA"));
 

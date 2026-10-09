@@ -2,7 +2,7 @@
   {
     "name": "/SmartDashboard/Auto Choices/active",
     "type": "string",
-    "value": "Left Follow",
+    "value": "Right Normal",
     "properties": {
       "persistent": true
     }
